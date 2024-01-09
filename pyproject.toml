@@ -1,0 +1,27 @@
+[project]
+name = "nonebot-plugin-example"
+dynamic = ["version"]
+description = "Template plugin project"
+authors = [{ name = "student_2333", email = "lgc2333@126.com" }]
+dependencies = [
+    "nonebot2>=2.0.0",
+    "pydantic>=1.10.4,<2",
+    "nonebot-plugin-alconna>=0.33.8",
+]
+requires-python = ">=3.8,<4.0"
+readme = "README.md"
+license = { text = "MIT" }
+
+[project.urls]
+homepage = "https://github.com/owner/nonebot-plugin-example"
+
+[tool.pdm.build]
+includes = []
+
+[tool.pdm.version]
+source = "file"
+path = "nonebot_plugin_example/__init__.py"
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
