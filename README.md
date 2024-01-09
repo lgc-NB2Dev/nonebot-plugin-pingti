@@ -10,47 +10,40 @@
   <img src="https://raw.githubusercontent.com/lgc-NB2Dev/readme/main/template/plugin.svg" alt="NoneBotPluginText">
 </p>
 
-# nonebot-plugin-example
+# NoneBot-Plugin-PingTi
 
-_✨ NoneBot 插件简单描述 ✨_
+_✨ 让 AI 帮你寻找更低价的购物搜索词 ✨_
 
 <img src="https://img.shields.io/badge/python-3.8+-blue.svg" alt="python">
 <a href="https://pdm.fming.dev">
   <img src="https://img.shields.io/badge/pdm-managed-blueviolet" alt="pdm-managed">
 </a>
-<!-- <a href="https://wakatime.com/badge/user/b61b0f9a-f40b-4c82-bc51-0a75c67bfccf/project/f4778875-45a4-4688-8e1b-b8c844440abb">
-  <img src="https://wakatime.com/badge/user/b61b0f9a-f40b-4c82-bc51-0a75c67bfccf/project/f4778875-45a4-4688-8e1b-b8c844440abb.svg" alt="wakatime">
-</a> -->
+<a href="https://wakatime.com/badge/user/b61b0f9a-f40b-4c82-bc51-0a75c67bfccf/project/018cef6a-03d4-4902-8b19-272f441456ef">
+  <img src="https://wakatime.com/badge/user/b61b0f9a-f40b-4c82-bc51-0a75c67bfccf/project/018cef6a-03d4-4902-8b19-272f441456ef.svg" alt="wakatime">
+</a>
 
 <br />
 
 <a href="./LICENSE">
-  <img src="https://img.shields.io/github/license/owner/nonebot-plugin-example.svg" alt="license">
+  <img src="https://img.shields.io/github/license/lgc-NB2Dev/nonebot-plugin-pingti.svg" alt="license">
 </a>
-<a href="https://pypi.python.org/pypi/nonebot-plugin-example">
-  <img src="https://img.shields.io/pypi/v/nonebot-plugin-example.svg" alt="pypi">
+<a href="https://pypi.python.org/pypi/nonebot-plugin-pingti">
+  <img src="https://img.shields.io/pypi/v/nonebot-plugin-pingti.svg" alt="pypi">
 </a>
-<a href="https://pypi.python.org/pypi/nonebot-plugin-example">
-  <img src="https://img.shields.io/pypi/dm/nonebot-plugin-example" alt="pypi download">
+<a href="https://pypi.python.org/pypi/nonebot-plugin-pingti">
+  <img src="https://img.shields.io/pypi/dm/nonebot-plugin-pingti" alt="pypi download">
 </a>
 
 </div>
 
-这是一个 nonebot2 插件项目的模板库, 你可以直接使用本模板创建你的 nonebot2 插件项目的仓库
+## 📖 简介
 
-模板库使用方法:
+节选自[原网站](https://www.pingti.xyz/)：
 
-1. 点击仓库中的 `Use this template` 按钮, 输入仓库名与描述, 点击 `Create repository from template` 创建仓库
-2. 全局替换 `owner` 为仓库所有者 ID;  
-   全局替换 `nonebot-plugin-example` 为插件名;  
-   全局替换 `nonebot_plugin_example` 为包名;  
-   修改 python 徽标中的版本为你插件的运行所需版本;  
-   替换 WakaTime 的徽标
-3. 修改 `README.md` 中的插件名和插件描述, 并在下方填充相应的内容
-
-## 📖 介绍
-
-这里是插件的详细介绍部分
+> 同一件商品，不同的搜索词，价格可能会天差地别。  
+> 这个工具旨在帮助你找到最便宜的搜索词：  
+> 输入你想搜索的商品名，AI 会给出低价的替代品，结果可能不准，开心就好 :)  
+> 经济寒冬，商品可以平替，但你的生活无法被平替。
 
 ## 💿 安装
 
@@ -61,7 +54,7 @@ _✨ NoneBot 插件简单描述 ✨_
 在 nonebot2 项目的根目录下打开命令行, 输入以下指令即可安装
 
 ```bash
-nb plugin install nonebot-plugin-example
+nb plugin install nonebot-plugin-pingti
 ```
 
 </details>
@@ -74,7 +67,7 @@ nb plugin install nonebot-plugin-example
 <summary>pip</summary>
 
 ```bash
-pip install nonebot-plugin-example
+pip install nonebot-plugin-pingti
 ```
 
 </details>
@@ -82,7 +75,7 @@ pip install nonebot-plugin-example
 <summary>pdm</summary>
 
 ```bash
-pdm add nonebot-plugin-example
+pdm add nonebot-plugin-pingti
 ```
 
 </details>
@@ -90,7 +83,7 @@ pdm add nonebot-plugin-example
 <summary>poetry</summary>
 
 ```bash
-poetry add nonebot-plugin-example
+poetry add nonebot-plugin-pingti
 ```
 
 </details>
@@ -98,7 +91,7 @@ poetry add nonebot-plugin-example
 <summary>conda</summary>
 
 ```bash
-conda install nonebot-plugin-example
+conda install nonebot-plugin-pingti
 ```
 
 </details>
@@ -109,7 +102,7 @@ conda install nonebot-plugin-example
 [tool.nonebot]
 plugins = [
     # ...
-    "nonebot_plugin_example"
+    "nonebot_plugin_pingti"
 ]
 ```
 
@@ -117,25 +110,16 @@ plugins = [
 
 ## ⚙️ 配置
 
-在 nonebot2 项目的`.env`文件中添加下表中的必填配置
+在 NoneBot2 项目的`.env`文件中添加下表中的必填配置
 
-|  配置项  | 必填 | 默认值 |   说明   |
-| :------: | :--: | :----: | :------: |
-| 配置项 1 |  是  |   无   | 配置说明 |
-| 配置项 2 |  否  |   无   | 配置说明 |
+|          配置项          | 必填 | 默认值 |          说明          |
+| :----------------------: | :--: | :----: | :--------------------: |
+|         `PROXY`          |  否  |   无   |   请求使用的代理地址   |
+| `PINGTI_REQUEST_TIMEOUT` |  否  |  `5`   | 请求超时时间，单位为秒 |
 
 ## 🎉 使用
 
-### 指令表
-
-|  指令  | 权限 | 需要@ | 范围 |   说明   |
-| :----: | :--: | :---: | :--: | :------: |
-| 指令 1 | 主人 |  否   | 私聊 | 指令说明 |
-| 指令 2 | 群员 |  是   | 群聊 | 指令说明 |
-
-### 效果图
-
-如果有效果图的话
+指令：`平替`
 
 ## 📞 联系
 
@@ -146,7 +130,13 @@ Telegram：[@lgc2333](https://t.me/lgc2333)
 
 ## 💡 鸣谢
 
-如果有要鸣谢的人的话
+### [pingti.xyz](https://www.pingti.xyz/)
+
+- 服务提供
+
+### [ilharp/koishi-plugin-pingti](https://github.com/ilharp/koishi-plugin-pingti)
+
+- ~~抄袭~~ 借鉴
 
 ## 💰 赞助
 
