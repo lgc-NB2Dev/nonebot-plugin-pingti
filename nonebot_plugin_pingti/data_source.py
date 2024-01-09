@@ -14,9 +14,14 @@ from .config import config
 
 DATA_DIR = Path.cwd() / "data" / "pingti"
 DATA_FILE = DATA_DIR / "cache.json"
+if not DATA_DIR.exists():
+    DATA_DIR.mkdir(parents=True)
+if not DATA_FILE.exists():
+    DATA_FILE.write_text("{}", "u8")
 
 
 async def query_from_db(kw: str) -> Optional[str]:
+    kw = kw.lower()
     try:
         data = json.loads(DATA_FILE.read_text("u8"))
     except Exception:
@@ -28,6 +33,7 @@ async def query_from_db(kw: str) -> Optional[str]:
 
 
 async def save_to_db(kw: str, resp: str) -> None:
+    kw = kw.lower()
     try:
         data = json.loads(DATA_FILE.read_text("u8"))
         data[kw] = resp
@@ -55,9 +61,18 @@ async def request_alternative(kw: str) -> str:
         proxies=config.proxy,
         timeout=config.pingti_request_timeout,
     ) as client:
+        logger.debug(f"Requesting alternative for `{kw}`")
         resp = await client.post(
             "https://www.pingti.xyz/api/chat",
             json={"messages": [{"role": "user", "content": kw}]},
+            headers={
+                "User-Agent": (
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/114.0.0.0 "
+                    "Safari/537.36"
+                ),
+            },
         )
         resp.raise_for_status()
         return resp.text
