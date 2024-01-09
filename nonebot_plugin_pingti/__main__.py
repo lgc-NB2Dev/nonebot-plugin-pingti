@@ -5,7 +5,6 @@ from arclet.alconna.exceptions import SpecialOptionTriggered
 from nonebot import logger
 from nonebot_plugin_alconna import AlconnaMatcher, CommandResult, UniMessage, on_alconna
 from nonebot_plugin_alconna.uniseg import Receipt
-from nonebot_plugin_orm import AsyncSession
 
 from .data_source import get_alternative_put_queue, query_from_db
 
@@ -43,16 +42,16 @@ async def _(matcher: AlconnaMatcher, res: CommandResult):
 
 
 @mat_pingti.handle()
-async def _(matcher: AlconnaMatcher, session: AsyncSession, kw: str):
+async def _(matcher: AlconnaMatcher, kw: str):
     kw = kw.strip()
     if not kw:
         await matcher.finish("名称不能为空")
     if len(kw) > 15:
         await matcher.finish("输入的名称太长啦，换一个短一点的商品试试吧~")
 
-    if not (val := await query_from_db(session, kw)):
+    if not (val := await query_from_db(kw)):
         async with recall(await UniMessage("正在寻找平替……").send()):
-            val = await get_alternative_put_queue(session, kw)
+            val = await get_alternative_put_queue(kw)
 
     if val:
         await matcher.finish(f"{kw} 的平替是：{val}")

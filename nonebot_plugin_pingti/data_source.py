@@ -1,40 +1,37 @@
 import asyncio
+import json
+from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Awaitable, Callable, Optional
 
-from attr import dataclass
 from httpx import AsyncClient
 from nonebot import get_driver, logger
-from nonebot_plugin_orm import Model
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy.sql import select
 
 from .config import config
 
 # region db
+# 操你妈，完全不会用关系型数据库和 ORM，我是废物 😭😭😭
+
+DATA_DIR = Path.cwd() / "data" / "pingti"
+DATA_FILE = DATA_DIR / "cache.json"
 
 
-class Item(Model):
-    kw: Mapped[str] = mapped_column(primary_key=True)
-    resp: Mapped[str]
-
-
-async def query_from_db(session: AsyncSession, kw: str) -> Optional[str]:
+async def query_from_db(kw: str) -> Optional[str]:
     try:
-        res = await session.execute(select(Item).where(Item.kw == kw))
-        item = res.scalars().first()
+        data = json.loads(DATA_FILE.read_text("u8"))
     except Exception:
         logger.exception("Error when querying database")
     else:
-        if item is not None:
-            return item.resp
+        if kw in data:
+            return data[kw]
     return None
 
 
-async def save_to_db(session: AsyncSession, kw: str, resp: str) -> None:
+async def save_to_db(kw: str, resp: str) -> None:
     try:
-        session.add(Item(kw=kw, resp=resp))
-        await session.commit()
+        data = json.loads(DATA_FILE.read_text("u8"))
+        data[kw] = resp
+        DATA_FILE.write_text(json.dumps(data, ensure_ascii=False), "u8")
     except Exception:
         logger.exception("Error when committing database")
 
@@ -46,7 +43,6 @@ async def save_to_db(session: AsyncSession, kw: str, resp: str) -> None:
 
 @dataclass
 class QueueItem:
-    session: AsyncSession
     kw: str
     callback: Callable[[Optional[str]], Awaitable[Any]]
 
@@ -67,7 +63,7 @@ async def request_alternative(kw: str) -> str:
         return resp.text
 
 
-async def get_alternative_put_queue(session: AsyncSession, kw: str) -> str:
+async def get_alternative_put_queue(kw: str) -> str:
     val = ...
 
     async def callback(resp: Optional[str]) -> None:
@@ -76,7 +72,7 @@ async def get_alternative_put_queue(session: AsyncSession, kw: str) -> str:
         if resp is None:
             return
 
-    await queue.put(QueueItem(session, kw, callback))
+    await queue.put(QueueItem(kw, callback))
     while val is ...:
         await asyncio.sleep(0)
     return val
@@ -91,7 +87,7 @@ async def handle_queue():
 
     async def once():
         it = await queue.get()
-        if x := await query_from_db(it.session, it.kw):
+        if x := await query_from_db(it.kw):
             await call(it, x)
             queue.task_done()
             return
@@ -103,7 +99,7 @@ async def handle_queue():
             await call(it, None)
         else:
             await call(it, val)
-            await save_to_db(it.session, it.kw, val)
+            await save_to_db(it.kw, val)
         queue.task_done()
         await asyncio.sleep(2)
 
