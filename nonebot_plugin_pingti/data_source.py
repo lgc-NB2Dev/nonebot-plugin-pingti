@@ -5,7 +5,7 @@ from attr import dataclass
 from httpx import AsyncClient
 from nonebot import get_driver, logger
 from nonebot_plugin_orm import Model
-from sqlalchemy.ext.asyncio import AsyncSession, async_scoped_session
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import select
 
@@ -19,10 +19,7 @@ class Item(Model):
     resp: Mapped[str]
 
 
-async def query_from_db(
-    session: async_scoped_session[AsyncSession],
-    kw: str,
-) -> Optional[str]:
+async def query_from_db(session: AsyncSession, kw: str) -> Optional[str]:
     try:
         res = await session.execute(select(Item).where(Item.kw == kw))
         item = res.scalars().first()
@@ -34,11 +31,7 @@ async def query_from_db(
     return None
 
 
-async def save_to_db(
-    session: async_scoped_session[AsyncSession],
-    kw: str,
-    resp: str,
-) -> None:
+async def save_to_db(session: AsyncSession, kw: str, resp: str) -> None:
     try:
         session.add(Item(kw=kw, resp=resp))
         await session.commit()
@@ -53,6 +46,7 @@ async def save_to_db(
 
 @dataclass
 class QueueItem:
+    session: AsyncSession
     kw: str
     callback: Callable[[Optional[str]], Awaitable[Any]]
 
@@ -73,7 +67,7 @@ async def request_alternative(kw: str) -> str:
         return resp.text
 
 
-async def get_alternative_put_queue(kw: str) -> str:
+async def get_alternative_put_queue(session: AsyncSession, kw: str) -> str:
     val = ...
 
     async def callback(resp: Optional[str]) -> None:
@@ -82,30 +76,42 @@ async def get_alternative_put_queue(kw: str) -> str:
         if resp is None:
             return
 
-    await queue.put(QueueItem(kw, callback))
+    await queue.put(QueueItem(session, kw, callback))
     while val is ...:
         await asyncio.sleep(0)
     return val
 
 
 async def handle_queue():
-    async def call(it_: QueueItem, val: Optional[str]) -> None:
+    async def call(it: QueueItem, val: Optional[str]) -> None:
         try:
-            await it_.callback(val)
+            await it.callback(val)
         except Exception:
             logger.exception("Error when calling callback")
 
-    while True:
+    async def once():
         it = await queue.get()
+        if x := await query_from_db(it.session, it.kw):
+            await call(it, x)
+            queue.task_done()
+            return
+
         try:
-            resp = await request_alternative(it.kw)
+            val = await request_alternative(it.kw)
         except Exception:
             logger.exception("Error when doing request")
             await call(it, None)
         else:
-            await call(it, resp)
+            await call(it, val)
+            await save_to_db(it.session, it.kw, val)
         queue.task_done()
         await asyncio.sleep(2)
+
+    while True:
+        try:
+            await once()
+        except Exception:
+            logger.exception("Error when handling queue")
 
 
 driver = get_driver()
