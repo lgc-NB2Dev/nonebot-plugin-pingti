@@ -65,7 +65,7 @@ queue = asyncio.Queue[QueueItem]()
 
 async def request_alternative(kw: str) -> str:
     async with AsyncClient(
-        proxies=config.proxy,
+        proxies=config.pingti_proxy,
         timeout=config.pingti_request_timeout,
     ) as client:
         logger.debug(f"Requesting alternative for `{kw}`")

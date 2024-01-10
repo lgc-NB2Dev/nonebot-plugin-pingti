@@ -5,7 +5,7 @@ require("nonebot_plugin_alconna")
 from . import __main__ as __main__  # noqa: E402
 from .config import ConfigModel  # noqa: E402
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 __plugin_meta__ = PluginMetadata(
     name="最佳平替",
     description="用更低价的搜索词购物",
