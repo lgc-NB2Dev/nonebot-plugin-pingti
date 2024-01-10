@@ -112,10 +112,12 @@ plugins = [
 
 在 NoneBot2 项目的`.env`文件中添加下表中的必填配置
 
-|          配置项          | 必填 | 默认值 |          说明          |
-| :----------------------: | :--: | :----: | :--------------------: |
-|         `PROXY`          |  否  |   无   |   请求使用的代理地址   |
-| `PINGTI_REQUEST_TIMEOUT` |  否  |  `5`   | 请求超时时间，单位为秒 |
+|          配置项          | 必填 | 默认值 |                说明                |
+| :----------------------: | :--: | :----: | :--------------------------------: |
+|      `PINGTI_PROXY`      |  否  |   无   |         请求使用的代理地址         |
+| `PINGTI_REQUEST_TIMEOUT` |  否  |  `5`   |       请求超时时间，单位为秒       |
+|    `PINGTI_SEND_TIP`     |  否  |  `5`   | 缓存中不存在回答时是否发送提示消息 |
+|   `PINGTI_RECALL_TIP`    |  否  |  `5`   |     发送提示消息后是否自动撤回     |
 
 ## 🎉 使用
 
@@ -151,6 +153,13 @@ Telegram：[@lgc2333](https://t.me/lgc2333)
   </details>
 
 ## 📝 更新日志
+
+### 0.1.2
+
+- 实现 [#1](https://github.com/lgc-NB2Dev/nonebot-plugin-pingti/issues/1)：
+  - 重命名配置项 `PROXY` -> `PINGTI_PROXY`
+  - 添加配置项 `PINGTI_SEND_TIP`
+  - 添加配置项 `PINGTI_RECALL_TIP`
 
 ### 0.1.1
 
