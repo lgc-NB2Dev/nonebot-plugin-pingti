@@ -51,8 +51,12 @@ async def _(matcher: AlconnaMatcher, kw: str):
 
     if not (val := await query_from_db(kw)):
         async with recall(await UniMessage("正在寻找平替……").send()):
-            val = await get_alternative_put_queue(kw)
+            try:
+                val = await get_alternative_put_queue(kw)
+            except Exception:
+                await matcher.finish("出现了一些问题，请稍后再试吧 >_<")
 
     if val:
         await matcher.finish(f"{kw} 的平替是：{val}")
-    await matcher.finish("出现了一些问题，请稍后再试吧 >_<")
+    # 有可能返回值为空，不知道是什么情况
+    await matcher.finish("好像并没有找到平替呢")
