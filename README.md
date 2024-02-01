@@ -154,6 +154,10 @@ Telegram：[@lgc2333](https://t.me/lgc2333)
 
 ## 📝 更新日志
 
+### 0.1.3
+
+- 修复无法使用的问题
+
 ### 0.1.2
 
 - 实现 [#1](https://github.com/lgc-NB2Dev/nonebot-plugin-pingti/issues/1)：
