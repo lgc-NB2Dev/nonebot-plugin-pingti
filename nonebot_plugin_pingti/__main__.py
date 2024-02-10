@@ -46,7 +46,9 @@ async def _(matcher: AlconnaMatcher, kw: str):
 
     if not (val := await query_from_db(kw)):
         receipt = (
-            (await UniMessage("正在寻找平替……").send()) if config.pingti_send_tip else None
+            (await UniMessage("正在寻找平替……").send())
+            if config.pingti_send_tip
+            else None
         )
         try:
             val = await get_alternative_put_queue(kw)
