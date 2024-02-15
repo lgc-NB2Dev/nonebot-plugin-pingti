@@ -1,6 +1,6 @@
 from typing import Optional
 
-from nonebot import get_driver
+from nonebot import get_plugin_config
 from pydantic import BaseModel
 
 
@@ -11,4 +11,4 @@ class ConfigModel(BaseModel):
     pingti_recall_tip: bool = True
 
 
-config: ConfigModel = ConfigModel.parse_obj(get_driver().config)
+config: ConfigModel = get_plugin_config(ConfigModel)

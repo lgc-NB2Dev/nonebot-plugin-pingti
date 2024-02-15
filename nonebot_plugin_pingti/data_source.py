@@ -60,7 +60,14 @@ class QueueItem:
     callback: Callable[[Union[str, Exception]], Awaitable[Any]]
 
 
-queue = asyncio.Queue[QueueItem]()
+_global_queue: Optional[asyncio.Queue[QueueItem]] = None
+
+
+def ensure_queue() -> asyncio.Queue[QueueItem]:
+    global _global_queue
+    if _global_queue is None:
+        _global_queue = asyncio.Queue()
+    return _global_queue
 
 
 async def request_alternative(kw: str) -> str:
@@ -94,6 +101,7 @@ async def get_alternative_put_queue(kw: str) -> str:
             nonlocal val
             val = r
 
+        queue = ensure_queue()
         await queue.put(QueueItem(kw, callback))
 
         while val is ...:
@@ -114,6 +122,7 @@ async def handle_queue():
             logger.exception("Error when calling callback")
 
     async def once():
+        queue = ensure_queue()
         it = await queue.get()
         if x := await query_from_db(it.kw):
             await call(it, x)
