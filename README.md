@@ -37,6 +37,15 @@ _✨ 让 AI 帮你寻找更低价的购物搜索词 ✨_
   <img src="https://img.shields.io/pypi/dm/nonebot-plugin-pingti" alt="pypi download">
 </a>
 
+<br />
+
+<a href="https://registry.nonebot.dev/plugin/nonebot-plugin-pingti:nonebot_plugin_pingti">
+  <img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fnbbdg.lgc2333.top%2Fplugin%2Fnonebot-plugin-pingti" alt="NoneBot Registry">
+</a>
+<a href="https://registry.nonebot.dev/plugin/nonebot-plugin-pingti:nonebot_plugin_pingti">
+  <img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fnbbdg.lgc2333.top%2Fplugin-adapters%2Fnonebot-plugin-pingti" alt="Supported Adapters">
+</a>
+
 </div>
 
 ## 📖 简介
