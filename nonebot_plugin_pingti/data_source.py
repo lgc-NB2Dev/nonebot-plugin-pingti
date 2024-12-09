@@ -1,159 +1,87 @@
-import asyncio
-import json
-from dataclasses import dataclass
-from pathlib import Path
-from typing import Any, Awaitable, Callable, Dict, Optional, Union, cast
+from abc import ABC
+from types import TracebackType
+from typing import Generic, Optional, TypeVar
+from typing_extensions import override
 
-from httpx import AsyncClient
-from nonebot import get_driver, logger
+from httpx import AsyncClient, Response
+from nonebot.compat import type_validate_python
+from pydantic import BaseModel
 
 from .config import config
 
-# region db
-# 操你妈，完全不会用关系型数据库和 ORM，我是废物 😭😭😭
+PING_TI_BASE_URL = "https://pingti.app"
+USER_AGENT = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+    " AppleWebKit/537.36 (KHTML, like Gecko)"
+    " Chrome/131.0.0.0"
+    " Safari/537.36"
+)
 
-DATA_DIR = Path.cwd() / "data" / "pingti"
-DATA_FILE = DATA_DIR / "cache.json"
-if not DATA_DIR.exists():
-    DATA_DIR.mkdir(parents=True)
-if not DATA_FILE.exists():
-    DATA_FILE.write_text("{}", "u8")
-else:
-    _d: Dict[str, str] = json.loads(DATA_FILE.read_text("u8"))
-    if any((not v) for v in _d.values()):
-        DATA_FILE.write_text(
-            json.dumps({k: v for k, v in _d.items() if v}, ensure_ascii=False),
-            encoding="u8",
+
+class ChatResp(BaseModel):
+    response: str
+    reason: str
+
+
+class FeedbackResp(BaseModel):
+    up: int
+    down: int
+    funny: int
+
+
+M = TypeVar("M", bound=BaseModel)
+
+
+class APIResponse(Generic[M]):
+    def __init__(self, resp: Response, model: type[M]):
+        self.resp = resp
+        self.model = model
+        self.parsed = type_validate_python(self.model, self.resp.json())
+
+
+class BaseAPI(ABC):  # noqa: B024
+    def __init__(self, **cli_kwargs) -> None:
+        super().__init__()
+        self.cli_kwargs = cli_kwargs
+        self.cli = self.create_client()
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(
+        self,
+        exc_type: Optional[type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ):
+        await self.cli.aclose()
+
+    def create_client(self):
+        return AsyncClient(**self.cli_kwargs)
+
+
+class PingTiAPI(BaseAPI):
+    @override
+    def __init__(self, **cli_kwargs) -> None:
+        cli_kwargs.setdefault("base_url", PING_TI_BASE_URL)
+        cli_kwargs.setdefault("proxy", config.pingti_proxy)
+        cli_kwargs.setdefault("timeout", config.pingti_request_timeout)
+        cli_kwargs.setdefault("headers", {})
+        cli_kwargs["headers"].setdefault("User-Agent", USER_AGENT)
+        super().__init__(**cli_kwargs)
+
+    async def chat(self, content: str):
+        r = await self.cli.post(
+            "/api/chat",
+            json={"messages": [{"role": "user", "content": content}]},
         )
+        r.raise_for_status()
+        return APIResponse(r, ChatResp)
 
-
-async def query_from_db(kw: str) -> Optional[str]:
-    kw = kw.lower()
-    try:
-        data: Dict[str, str] = json.loads(DATA_FILE.read_text("u8"))
-    except Exception:
-        logger.exception("Error when querying database")
-    else:
-        if kw in data:
-            return data[kw]
-    return None
-
-
-async def save_to_db(kw: str, resp: str) -> None:
-    kw = kw.lower()
-    try:
-        data: Dict[str, str] = json.loads(DATA_FILE.read_text("u8"))
-        data[kw] = resp
-        DATA_FILE.write_text(json.dumps(data, ensure_ascii=False), encoding="u8")
-    except Exception:
-        logger.exception("Error when committing database")
-
-
-# endregion
-
-# region queue
-
-
-@dataclass
-class QueueItem:
-    kw: str
-    callback: Callable[[Union[str, Exception]], Awaitable[Any]]
-
-
-_global_queue: Optional[asyncio.Queue[QueueItem]] = None
-
-
-def ensure_queue() -> asyncio.Queue[QueueItem]:
-    global _global_queue
-    if _global_queue is None:
-        _global_queue = asyncio.Queue()
-    return _global_queue
-
-
-async def request_alternative(kw: str) -> str:
-    async with AsyncClient(
-        proxies=config.pingti_proxy,
-        timeout=config.pingti_request_timeout,
-        follow_redirects=True,
-    ) as client:
-        logger.debug(f"Requesting alternative for `{kw}`")
-        resp = await client.post(
-            "https://www.pingti.app/api/chat",
-            json={"messages": [{"role": "user", "content": kw}]},
-            headers={
-                "User-Agent": (
-                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                    "AppleWebKit/537.36 (KHTML, like Gecko) "
-                    "Chrome/114.0.0.0 "
-                    "Safari/537.36"
-                ),
-            },
+    async def get_feedback(self, input_content: str, output_content: str):
+        r = await self.cli.get(
+            "/api/feedback",
+            params={"input": input_content, "output": output_content},
         )
-        resp.raise_for_status()
-        return resp.text
-
-
-async def get_alternative_put_queue(kw: str) -> str:
-    async def wait():
-        val = ...
-
-        async def callback(r: Union[str, Exception]) -> None:
-            nonlocal val
-            val = r
-
-        queue = ensure_queue()
-        await queue.put(QueueItem(kw, callback))
-
-        while val is ...:
-            await asyncio.sleep(0)
-        return cast(Union[str, Exception], val)
-
-    resp = await asyncio.wait_for(wait(), timeout=config.pingti_request_timeout + 1)
-    if isinstance(resp, Exception):
-        raise resp
-    return resp
-
-
-async def handle_queue():
-    async def call(it: QueueItem, val: Union[str, Exception]) -> None:
-        try:
-            await it.callback(val)
-        except Exception:
-            logger.exception("Error when calling callback")
-
-    async def once():
-        queue = ensure_queue()
-        it = await queue.get()
-        if x := await query_from_db(it.kw):
-            await call(it, x)
-            queue.task_done()
-            return
-
-        try:
-            val = await request_alternative(it.kw)
-        except Exception as e:
-            logger.exception("Error when doing request")
-            await call(it, e)
-        else:
-            if val:
-                await save_to_db(it.kw, val)
-            await call(it, val)
-        queue.task_done()
-        await asyncio.sleep(2)
-
-    while True:
-        try:
-            await once()
-        except Exception:
-            logger.exception("Unexpected error when handling queue")
-
-
-driver = get_driver()
-
-
-@driver.on_startup
-async def _():
-    asyncio.create_task(handle_queue())
-
-
-# endregion
+        r.raise_for_status()
+        return APIResponse(r, FeedbackResp)

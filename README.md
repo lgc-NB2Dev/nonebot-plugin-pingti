@@ -124,12 +124,13 @@ plugins = [
 
 在 NoneBot2 项目的`.env`文件中添加下表中的必填配置
 
-|          配置项          | 必填 | 默认值 |                说明                |
-| :----------------------: | :--: | :----: | :--------------------------------: |
-|      `PINGTI_PROXY`      |  否  |   无   |         请求使用的代理地址         |
-| `PINGTI_REQUEST_TIMEOUT` |  否  |  `5`   |       请求超时时间，单位为秒       |
-|    `PINGTI_SEND_TIP`     |  否  | `True` | 缓存中不存在回答时是否发送提示消息 |
-|   `PINGTI_RECALL_TIP`    |  否  | `True` |     发送提示消息后是否自动撤回     |
+|           配置项            | 必填 | 默认值  |            说明            |
+| :-------------------------: | :--: | :-----: | :------------------------: |
+|       `PINGTI_PROXY`        |  否  |   无    |     请求使用的代理地址     |
+|  `PINGTI_REQUEST_TIMEOUT`   |  否  |   `5`   |   请求超时时间，单位为秒   |
+|      `PINGTI_SEND_TIP`      |  否  | `True`  |      是否发送提示消息      |
+|     `PINGTI_RECALL_TIP`     |  否  | `True`  | 发送提示消息后是否自动撤回 |
+| `PINGTI_SHOW_ZERO_FEEDBACK` |  否  | `False` |  是否展示数量为 0 的评价   |
 
 ## 🎉 使用
 
@@ -144,7 +145,7 @@ Telegram：[@lgc2333](https://t.me/lgc2333)
 
 ## 💡 鸣谢
 
-### [pingti.xyz](https://www.pingti.xyz/)
+### [pingti.app](https://www.pingti.app/)
 
 - 服务提供
 
@@ -159,6 +160,11 @@ Telegram：[@lgc2333](https://t.me/lgc2333)
 感谢大家的赞助！你们的赞助将是我继续创作的动力！
 
 ## 📝 更新日志
+
+### 0.2.0
+
+- 重构插件
+- 新增配置项 `PINGTI_SHOW_ZERO_FEEDBACK`
 
 ### 0.1.4
 

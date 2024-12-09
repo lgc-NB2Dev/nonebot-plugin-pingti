@@ -1,11 +1,14 @@
+from pathlib import Path
+
 from nonebot.plugin import PluginMetadata, inherit_supported_adapters, require
 
 require("nonebot_plugin_alconna")
+require("nonebot_plugin_waiter")
 
 from . import __main__ as __main__  # noqa: E402
 from .config import ConfigModel  # noqa: E402
 
-__version__ = "0.1.4"
+__version__ = "0.2.0"
 __plugin_meta__ = PluginMetadata(
     name="最佳平替",
     description="用更低价的搜索词购物",
@@ -20,6 +23,15 @@ __plugin_meta__ = PluginMetadata(
     type="application",
     homepage="https://github.com/lgc-NB2Dev/nonebot-plugin-pingti",
     config=ConfigModel,
-    supported_adapters=inherit_supported_adapters("nonebot_plugin_alconna"),
+    supported_adapters=inherit_supported_adapters(
+        "nonebot_plugin_alconna",
+        "nonebot_plugin_waiter",
+    ),
     extra={"License": "MIT", "Author": "student_2333"},
 )
+
+OLD_DATA_DIR = Path.cwd() / "data" / "pingti"
+if OLD_DATA_DIR.exists():
+    import shutil
+
+    shutil.rmtree(OLD_DATA_DIR)
