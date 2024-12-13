@@ -8,7 +8,7 @@ require("nonebot_plugin_waiter")
 from . import __main__ as __main__  # noqa: E402
 from .config import ConfigModel  # noqa: E402
 
-__version__ = "0.2.0"
+__version__ = "0.2.0.post1"
 __plugin_meta__ = PluginMetadata(
     name="最佳平替",
     description="用更低价的搜索词购物",
