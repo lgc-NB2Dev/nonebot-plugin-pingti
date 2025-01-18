@@ -2,7 +2,7 @@
 name = "nonebot-plugin-pingti"
 dynamic = ["version"]
 description = "Shop with lower prices by searching with alternative keywords."
-authors = [{ name = "student_2333", email = "lgc2333@126.com" }]
+authors = [{ name = "LgCookie", email = "lgc2333@126.com" }]
 dependencies = [
     "nonebot2>=2.4.0",
     "nonebot-plugin-alconna>=0.54.1",

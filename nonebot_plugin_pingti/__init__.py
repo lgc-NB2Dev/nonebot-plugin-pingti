@@ -27,7 +27,7 @@ __plugin_meta__ = PluginMetadata(
         "nonebot_plugin_alconna",
         "nonebot_plugin_waiter",
     ),
-    extra={"License": "MIT", "Author": "student_2333"},
+    extra={"License": "MIT", "Author": "LgCookie"},
 )
 
 OLD_DATA_DIR = Path.cwd() / "data" / "pingti"
