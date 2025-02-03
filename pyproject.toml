@@ -4,11 +4,11 @@ dynamic = ["version"]
 description = "Shop with lower prices by searching with alternative keywords."
 authors = [{ name = "LgCookie", email = "lgc2333@126.com" }]
 dependencies = [
-    "nonebot2>=2.4.0",
-    "nonebot-plugin-alconna>=0.54.1",
-    "nonebot-plugin-waiter>=0.8.0",
-    "cookit[loguru,nonebot-alconna,pydantic]>=0.8.4",
-    "httpx>=0.27.0",
+    "nonebot2>=2.4.1",
+    "nonebot-plugin-alconna>=0.54.2",
+    "nonebot-plugin-waiter>=0.8.1",
+    "cookit[loguru,nonebot-alconna,pydantic]>=0.9.3",
+    "httpx>=0.27.2",
 ]
 requires-python = ">=3.9,<4.0"
 readme = "README.md"
